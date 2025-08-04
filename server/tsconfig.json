@@ -4,10 +4,12 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
+    "baseUrl": "./",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
+    
     "target": "esnext",
     "types": [],
     // For nodejs:
@@ -42,6 +44,9 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
 
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true,
+    "moduleResolution": "nodenext",
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
