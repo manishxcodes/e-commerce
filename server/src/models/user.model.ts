@@ -44,7 +44,7 @@ const userSchema: Schema = new Schema({
         default: constants.USER_TYPES.USER,
         enum: [constants.USER_TYPES.ADMIN, constants.USER_TYPES.USER]
     }
-});
+}, {timestamps: true});
 
 export const User = mongoose.model<UserType>('User', userSchema);
 
