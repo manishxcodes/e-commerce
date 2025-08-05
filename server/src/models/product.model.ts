@@ -33,22 +33,17 @@ const productSchema: Schema = new Schema<ProductType>({
         maxLength: 30
     },
     category: {
-
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: true
     },
     images: [{
         type: String
     }],
     sizes: [{
         size: {
-            type: Number,
-            enum: [
-                constants.PRODUCT_SIZES.S, 
-                constants.PRODUCT_SIZES.M,
-                constants.PRODUCT_SIZES.L,
-                constants.PRODUCT_SIZES.XL,
-                constants.PRODUCT_SIZES.XXL,
-                constants.PRODUCT_SIZES.XXXL
-            ]
+            type: String,
+            enum: Object.values(constants.PRODUCT_SIZES)
         },
         quantity: {
             type: Number
