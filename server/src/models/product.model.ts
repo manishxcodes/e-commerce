@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { constants } from "../constants/index.ts"
 
-interface ProductType extends Document {
+export interface IProduct extends Document {
     title: string,
     description: string,
+    summary: string,
     brand: string,
     category: mongoose.Types.ObjectId,
+    thumbnail: string,
     images: string[],
     sizes: {
         size: string,
@@ -16,7 +18,7 @@ interface ProductType extends Document {
     inStock: boolean
 }
 
-const productSchema: Schema = new Schema<ProductType>({
+const productSchema: Schema = new Schema<IProduct>({
     title: {
         type: String,
         required: true,
@@ -27,6 +29,12 @@ const productSchema: Schema = new Schema<ProductType>({
         maxLength: 1000,
         required: true
     },
+    summary: {
+        type: String,
+        required: true,
+        maxlength: 200
+    }
+    ,
     brand: {
         type: String,
         required: true,
@@ -37,6 +45,10 @@ const productSchema: Schema = new Schema<ProductType>({
         ref: "Category",
         required: true
     },
+    thumbnail: {
+        type: String,
+        required: true,
+    },
     images: [{
         type: String
     }],
@@ -46,7 +58,8 @@ const productSchema: Schema = new Schema<ProductType>({
             enum: Object.values(constants.PRODUCT_SIZES)
         },
         quantity: {
-            type: Number
+            type: Number,
+            required: true
         }
     }],
     tags: [{
@@ -63,4 +76,4 @@ const productSchema: Schema = new Schema<ProductType>({
     }
 }, {timestamps: true});
 
-export const Product = mongoose.model<ProductType>("Product", productSchema);
+export const Product = mongoose.model<IProduct>("Product", productSchema);
