@@ -1,11 +1,11 @@
 import mongoose, { Schema, Document} from 'mongoose';
 
-interface CategoryType extends Document {
+export interface ICategory extends Document {
     name: string,
     imageUrl?: string,
 }
 
-const categorySchema = new Schema<CategoryType>({
+const categorySchema = new Schema<ICategory>({
     name: {
         type: String,
         trim: true,
@@ -15,4 +15,4 @@ const categorySchema = new Schema<CategoryType>({
     }
 }, {timestamps: true});
 
-export const Category = mongoose.model<CategoryType>("Category", categorySchema);
+export const Category = mongoose.model<ICategory>("Category", categorySchema);
