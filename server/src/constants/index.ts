@@ -11,5 +11,16 @@ export const constants = {
         XXL: "XXL",
         XXXL: "XXXl"
     },
+    PAYMENT_MODE: {
+        COD: "COD",
+        ONLINE: "ONLINE"
+    },
+    ORDER_STATUS: {
+        CANCELLED: "Cancelled",
+        DELIVERED: "Delivered",
+        SHIPPED: "Shipped",
+        PROCESSING: "Processing",
+        RECIEVED: "Recieved",
+    }
 }
 
