@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { constants } from "../constants/index.ts"
+import type { IUser } from './user.model.ts';
 
 export interface IProduct extends Document {
     title: string,
@@ -15,7 +16,8 @@ export interface IProduct extends Document {
     }[],
     tags?: string[],
     price: number,
-    inStock: boolean
+    inStock: boolean,
+    owner: IUser,
 }
 
 const productSchema: Schema = new Schema<IProduct>({
@@ -73,6 +75,10 @@ const productSchema: Schema = new Schema<IProduct>({
     inStock: {
         type: Boolean,
         default: true
+    },
+    owner: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User"
     }
 }, {timestamps: true});
 
