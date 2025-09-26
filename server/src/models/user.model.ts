@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { constants } from "../constants/index.ts";
 
-export interface UserType extends Document {
+export interface IUser extends Document {
     firstName: string,
     lastName: string,
     address: mongoose.Types.ObjectId,
@@ -11,7 +11,7 @@ export interface UserType extends Document {
     userType: number
 }
 
-const userSchema: Schema = new Schema({
+const userSchema: Schema = new Schema<IUser>({
     firstName: {
         type: String,
         required: true,
@@ -46,5 +46,5 @@ const userSchema: Schema = new Schema({
     }
 }, {timestamps: true});
 
-export const User = mongoose.model<UserType>('User', userSchema);
+export const User = mongoose.model<IUser>('User', userSchema);
 
