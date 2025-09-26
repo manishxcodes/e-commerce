@@ -62,4 +62,6 @@ const orderSchema: Schema = new mongoose.Schema<IOrder>({
         type: String,
         enum: Object.values(constants.ORDER_STATUS)
     }
-}, {timestamps: true})
+}, {timestamps: true});
+
+export const Order = mongoose.model<IOrder>("Order", orderSchema);
