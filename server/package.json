@@ -7,19 +7,25 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "dev": "npx tsx --watch -r dotenv/config src/index.ts",
-    "run": "node dist/index.js"
+    "run": "node dist/index.js",
+    "seed:users": "tsx src/script/seed.ts",
+    "seed:users:dev": "ts-node src/script/seed-users.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "express-validator": "^7.2.1",
     "mongoose": "^8.17.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.3",
+    "@types/express-validator": "^2.20.33",
     "@types/node": "^24.1.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
