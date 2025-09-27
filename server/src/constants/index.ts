@@ -20,7 +20,7 @@ export const constants = {
         DELIVERED: "Delivered",
         SHIPPED: "Shipped",
         PROCESSING: "Processing",
-        RECIEVED: "Recieved",
+        RECIEVED: "Received",
     }
 }
 
