@@ -10,13 +10,15 @@ dotenv.config();
 app.use(express.json());
 app.use('/api/v1', router)
 
-app.use(errorHandler);
+
 
 const port = process.env.PORT || 3000;
 
 app.get('/api/test', (req, res) => {
     res.json({message: "Test"})
 })
+
+app.use(errorHandler);
 
 connectToDB()
 .then(() => {
