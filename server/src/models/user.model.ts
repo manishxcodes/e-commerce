@@ -1,10 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { constants } from "../constants/index.ts";
+import { Address } from "./address.model.ts";
 
 export interface IUser extends Document {
     firstName: string,
     lastName: string,
-    address: mongoose.Types.ObjectId,
+    address?: mongoose.Types.ObjectId,
     email: string,
     password: string,
     phoneNumber: string,
@@ -23,7 +24,6 @@ const userSchema: Schema = new Schema<IUser>({
     address: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Address",
-        required: true
     },
     email: {
         type: String,
@@ -38,6 +38,7 @@ const userSchema: Schema = new Schema<IUser>({
     password: {
         type: String,
         required: true,
+        select: false
     },
     userType: {
         type: Number,
