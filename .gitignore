@@ -1,2 +1,6 @@
 node_modules/
 dist
+repositories
+services
+validators
+.env
