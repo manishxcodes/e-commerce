@@ -1,13 +1,22 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { connectToDB } from './db.ts'
+import router from './routes/index.ts'
+import { errorHandler } from 'middlewares/errorHandler.ts';
 
 const app = express();
 dotenv.config();
 
 app.use(express.json());
+app.use('/api/v1', router)
+
+app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
+
+app.get('/api/test', (req, res) => {
+    res.json({message: "Test"})
+})
 
 connectToDB()
 .then(() => {
