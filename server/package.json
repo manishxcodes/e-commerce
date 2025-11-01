@@ -20,13 +20,16 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
-    "mongoose": "^8.17.0"
+    "mongoose": "^8.17.0",
+    "nodemailer": "^7.0.6",
+    "otp-agent": "^3.3.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.3",
     "@types/express-validator": "^2.20.33",
     "@types/node": "^24.1.0",
+    "@types/nodemailer": "^7.0.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
