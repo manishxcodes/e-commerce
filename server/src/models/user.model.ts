@@ -1,15 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { constants } from "../constants/index.ts";
-import { Address } from "./address.model.ts";
 
 export interface IUser extends Document {
     firstName: string,
     lastName: string,
     address?: mongoose.Types.ObjectId,
     email: string,
-    password: string,
     phoneNumber: string,
-    userType: number
+    userType: number,
+    photoUrl?: string
 }
 
 const userSchema: Schema = new Schema<IUser>({
@@ -35,15 +34,13 @@ const userSchema: Schema = new Schema<IUser>({
         required: true,
         unique: true
     },
-    password: {
-        type: String,
-        required: true,
-        select: false
-    },
     userType: {
         type: Number,
         default: constants.USER_TYPES.USER,
         enum: [constants.USER_TYPES.ADMIN, constants.USER_TYPES.USER]
+    }, 
+    photoUrl: {
+        type: String, 
     }
 }, {timestamps: true});
 
