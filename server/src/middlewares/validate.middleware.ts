@@ -1,5 +1,4 @@
 import type { Response, Request, NextFunction } from "express";
-import path from "path";
 import { AppError } from "utils/AppError.ts";
 import { ZodSchema } from "zod/v3";
 
