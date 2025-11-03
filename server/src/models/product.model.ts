@@ -51,9 +51,15 @@ const productSchema: Schema = new Schema<IProduct>({
         type: String,
         required: true,
     },
-    images: [{
-        type: String
-    }],
+    images: {
+        type: [String],
+        validate: {
+            validator: function (val: string[]) {
+                return val.length <= 3;
+            },
+            message: "You can upload a maximum of 3 images per product"
+        }
+    },
     sizes: [{
         size: {
             type: String,
