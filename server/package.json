@@ -9,6 +9,7 @@
     "dev": "npx tsx --watch -r dotenv/config src/index.ts",
     "run": "node dist/index.js",
     "seed:users": "tsx src/script/seed.ts",
+    "seed:category": "tsx src/script/seed-category.ts",
     "seed:users:dev": "ts-node src/script/seed-users.ts"
   },
   "keywords": [],
