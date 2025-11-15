@@ -2,7 +2,9 @@ import mongoose, { Schema, Document} from "mongoose";
 
 export interface IOtp extends Document {
     email: string,
-    otp: string
+    otp: string,
+    isOtpVerified: boolean,
+    createdAt: Date
 }
 
 const otpSchema = new Schema<IOtp>({
@@ -13,8 +15,14 @@ const otpSchema = new Schema<IOtp>({
     otp: {
         type: String,
         required: true,
-        expireAfterSecond: 180
+        expireAfterSeconds: 180
+    },
+    isOtpVerified: {
+        type: Boolean,
+        default: false
     }
-});
+}, {timestamps: true});
+
+otpSchema.index({ createdAt: 1 }, { expireAfterSeconds: 180 });
 
 export const Otp = mongoose.model<IOtp>("Otp", otpSchema);
