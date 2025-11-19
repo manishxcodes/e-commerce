@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { Otp } from '../models/otp.model.ts';
 import nodemailer from 'nodemailer';
-import { asyncHandler } from "middlewares/asyncHanlder.ts";
+import { asyncHandler } from "middlewares/async-handler.ts";
 import { generateOTP } from "otp-agent";
 import { AppError } from "utils/AppError.ts";
 import { AppResponse } from "utils/AppResponse.ts";
