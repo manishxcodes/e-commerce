@@ -27,13 +27,14 @@ export const authMiddleware = asyncHandler(
         const authToken = req.header("Authorization");
         if(!authToken) return next(new AppError("Invalid token. Unauthorized", 401));
 
-        const jwtsecret = process.env.JWT_SECRET!;
+        const jwtsecret = process.env.JWT_SECRET;
+        if(!jwtsecret) return next(new AppError("Something went wrong", 500));
 
         const token = authToken.split(" ")[1];
         if(!token) return next(new AppError("Invalid token", 401));
 
-        const payload= await jwt.verify(token, jwtsecret) as IPayload;
-        if(!payload || !payload.userId) return next(new AppError("Invalid token", 401));
+        const payload = jwt.verify(token, jwtsecret) as IPayload;
+        if(!payload || !payload.userId) return next(new AppError("Invalid token", 401, {details: payload}));
 
         // verify if user exists in db
         const user = await User.findById(payload.userId);
@@ -44,5 +45,7 @@ export const authMiddleware = asyncHandler(
             userEmail: user.email,
             userType: user.userType
         }
+
+        return next();
     }
 )
