@@ -1,14 +1,18 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { constants } from "../constants/index.ts";
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 
 export interface IUser extends Document {
     firstName: string,
     lastName: string,
     address?: mongoose.Types.ObjectId,
     email: string,
+    password: string,
     phoneNumber: string,
     userType: number,
-    photoUrl?: string
+    photoUrl?: string,
+    refreshToken?: string
 }
 
 const userSchema: Schema = new Schema<IUser>({
@@ -29,6 +33,10 @@ const userSchema: Schema = new Schema<IUser>({
         required: true,
         unique: true
     },
+    password: {
+        type: String,
+        required: true
+    },
     phoneNumber: {
         type: String,
         required: true,
@@ -41,8 +49,41 @@ const userSchema: Schema = new Schema<IUser>({
     }, 
     photoUrl: {
         type: String, 
+    },
+    refreshToken: {
+        type: String,
     }
 }, {timestamps: true});
+
+userSchema.pre<IUser>("save", async function(next) {
+    if(!this.isModified("password")) return next();
+
+    this.password =  await bcrypt.hash(this.password , 10);
+    next();
+});
+
+userSchema.methods.isPasswordCorrect = async function(password: string) {
+    return await bcrypt.compare(password, this.password);
+}
+
+userSchema.methods.generateAccessToken = function() {
+    return jwt.sign({
+        userId: this.id,
+        email: this.email,
+        firstName: this.firstName, 
+        lastName: this.lastName
+    }, process.env.ACCESS_TOKEN_SECRET as string,{
+        expiresIn: "1h"
+    });
+}
+
+userSchema.methods.generateRefreshToken = function() {
+    return jwt.sign({
+        userId: this._id,
+    }, process.env.REFRESH_TOKEN_SECRET as string, {
+        expiresIn: "30d"
+    });
+}
 
 export const User = mongoose.model<IUser>('User', userSchema);
 
