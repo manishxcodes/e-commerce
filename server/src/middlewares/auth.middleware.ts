@@ -12,7 +12,8 @@ declare global {
             user?: {
                 userId?: string,
                 userType: number,
-                userEmail?: string
+                userEmail?: string,
+                username: string
             }
         }
     }
@@ -27,7 +28,7 @@ export const authMiddleware = asyncHandler(
         const authToken = req.header("Authorization");
         if(!authToken) return next(new AppError("Invalid token. Unauthorized", 401));
 
-        const jwtsecret = process.env.JWT_SECRET;
+        const jwtsecret = process.env.ACCESS_TOKEN_SECRET;
         if(!jwtsecret) return next(new AppError("Something went wrong", 500));
 
         const token = authToken.split(" ")[1];
@@ -43,7 +44,8 @@ export const authMiddleware = asyncHandler(
         req.user = {
             userId: (user._id as Types.ObjectId).toString(),
             userEmail: user.email,
-            userType: user.userType
+            userType: user.userType,
+            username: `${user.firstName} ${user.lastName}`
         }
 
         return next();
