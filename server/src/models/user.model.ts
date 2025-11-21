@@ -13,6 +13,9 @@ export interface IUser extends Document {
     userType: number,
     photoUrl?: string,
     refreshToken?: string
+    isPasswordCorrect(password: string): Promise<boolean>,
+    generateAccessToken(): string,
+    generateRefreshToken(): string
 }
 
 const userSchema: Schema = new Schema<IUser>({
@@ -35,7 +38,8 @@ const userSchema: Schema = new Schema<IUser>({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        select: false
     },
     phoneNumber: {
         type: String,
@@ -69,9 +73,6 @@ userSchema.methods.isPasswordCorrect = async function(password: string) {
 userSchema.methods.generateAccessToken = function() {
     return jwt.sign({
         userId: this.id,
-        email: this.email,
-        firstName: this.firstName, 
-        lastName: this.lastName
     }, process.env.ACCESS_TOKEN_SECRET as string,{
         expiresIn: "1h"
     });
