@@ -4,18 +4,34 @@ import { User } from "models/user.model.ts";
 import { Address } from "models/address.model.ts";
 import { AppError } from "utils/AppError.ts";
 import { AppResponse } from "utils/AppResponse.ts";
+import { Otp } from "models/otp.model.ts";
 
 export const registerUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { firstName, lastName, email, password, phoneNumber, userType, photoUrl } = req.body;
+        const { firstName, lastName, email, password, phoneNumber, userType } = req.body;
 
         // check if user exists
-
-        // hash password
+        const isExistingUser = await User.findOne({email});
+        if(isExistingUser) return next(new AppError("User already exists with this email", 409));
 
         // check if otp verified with this email
+        const otp = await Otp.findOne({ email });
+        if(!otp?.isOtpVerified) return next(new AppError("OTP not verified",400));
 
         // then save data
+        const user = await User.create({
+            firstName,
+            lastName,
+            email,
+            password,
+            phoneNumber,
+            userType,
+        });
+
+        const createdUser = await User.findById(user._id);
+        if(!createdUser) return next(new AppError("Something went wrong while registering user. Please try again", 500));
+
+        return AppResponse.success(res, "User registered successfully");
     }  
 ); 
 
