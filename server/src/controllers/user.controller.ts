@@ -5,6 +5,7 @@ import { Address } from "models/address.model.ts";
 import { AppError } from "utils/AppError.ts";
 import { AppResponse } from "utils/AppResponse.ts";
 import { Otp } from "models/otp.model.ts";
+import jwt from "jsonwebtoken";
 
 export const registerUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -92,7 +93,55 @@ export const logout = asyncHandler(
                 AppResponse.success(res, "Logged Out Successfully")
             );
     }
-)
+);
+
+export const refreshAccessToken = asyncHandler(
+    async(req: Request, res: Response, next: NextFunction) => {
+        const incomingRefreshToken = req.cookies.refreshToken;
+        if(!incomingRefreshToken) return next(new AppError("Unauthorized - No refresh token", 401));
+
+        let decoded;
+        try {
+            decoded = jwt.verify(
+                incomingRefreshToken,
+                process.env.REFRESH_TOKEN_SECRET!,
+            ) as { userId: string };
+        } catch(err) {
+            return next(new AppError("Invalid Refresh Token", 401));
+        }
+
+        // find user
+        const user = await User.findById(decoded.userId);
+        if (!user) return next(new AppError("User not found", 404));
+
+        // Check if token matches DB token
+        if (user.refreshToken !== incomingRefreshToken) {
+            return next(new AppError("Refresh Token expired or reused", 401));
+        }
+
+        const newAccessToken = user.generateAccessToken();
+        const newRefreshToken = user.generateRefreshToken();
+
+        // Important: Save refresh token in DB
+        user.refreshToken = newRefreshToken;
+        await user.save({ validateBeforeSave: false });
+
+        const options = {
+            httpOnly: true,
+            secure: true,
+        };
+
+        return res
+            .status(200)
+            .cookie("accessToken", newAccessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json(
+                AppResponse.success(res, "Tokens refreshed successfully", {
+                    accessToken: newAccessToken,
+                })
+            );       
+    }
+);
 
 export const findUserByEmail = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
