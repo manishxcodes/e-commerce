@@ -1,15 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { constants } from "../constants/index.ts"
-import type { IUser } from './user.model.ts';
-
+import { AppError } from 'utils/AppError.ts';
 export interface IProduct extends Document {
     title: string,
     description: string,
     summary: string,
     brand: string,
     category: mongoose.Types.ObjectId,
-    thumbnail: string,
-    images: string[],
+    imageUrl: string,
     sizes: {
         size: string,
         quantity: number,
@@ -17,18 +15,22 @@ export interface IProduct extends Document {
     tags?: string[],
     price: number,
     inStock: boolean,
-    owner: IUser,
+    owner: mongoose.Types.ObjectId,
+
+    isSizeInStock(size: string, requestQuantity: number): boolean,
+    updateStockQuantity(size: string, requestQuantity: number): Promise<IProduct>,
+    isProductInstock(): boolean
 }
 
 const productSchema: Schema = new Schema<IProduct>({
     title: {
         type: String,
         required: true,
-        maxLength: 80,
+        maxlength: 80,
     },
     description: {
         type: String,
-        maxLength: 1000,
+        maxlength: 1000,
         required: true
     },
     summary: {
@@ -40,36 +42,31 @@ const productSchema: Schema = new Schema<IProduct>({
     brand: {
         type: String,
         required: true,
-        maxLength: 30
+        maxlength: 30
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
         required: true
     },
-    thumbnail: {
+    imageUrl: {
         type: String,
         required: true,
     },
-    images: {
-        type: [String],
-        validate: {
-            validator: function (val: string[]) {
-                return val.length <= 3;
+    sizes: {
+        type: [{
+            size: {
+                type: String,
+                enum: Object.values(constants.PRODUCT_SIZES),
+                required: true
             },
-            message: "You can upload a maximum of 3 images per product"
-        }
+            quantity: {
+                type: Number,
+                required: true
+            }
+        }],
+        required: true
     },
-    sizes: [{
-        size: {
-            type: String,
-            enum: Object.values(constants.PRODUCT_SIZES)
-        },
-        quantity: {
-            type: Number,
-            required: true
-        }
-    }],
     tags: [{
         type: String,
     }],
@@ -87,5 +84,36 @@ const productSchema: Schema = new Schema<IProduct>({
         ref: "User"
     }
 }, {timestamps: true});
+
+productSchema.methods.isSizeInStock = function(size: string, requestQuantity: number) {
+    const productSize = this.sizes.find(s => s.size === size);
+
+    if(!productSize) return false;
+
+    return productSize.quantity >= requestQuantity;
+}
+
+productSchema.methods.updateStockQuantity = async function(size: string, requestQuantity: number) {
+    const sizeIndex = this.sizes.findIndex(s => s.size === size);
+
+    if(sizeIndex === -1) throw new AppError(`Size ${size} not found for this product`, 404);
+
+    const newQuantity = this.sizes[sizeIndex].quantity + requestQuantity;
+
+    if(newQuantity < 0) throw new AppError(`Insufficient stock for size ${size}.`, 400);
+
+    this.sizes[sizeIndex].quantity = newQuantity;
+
+    const hasStock = this.sizes.some(s => s.quantity > 0);
+    this.inStock = hasStock;
+
+    return await this.save();
+}
+
+productSchema.methods.isProductInstock = function () {
+    const total = this.sizes.reduce((sum, s) => sum + s.quantity, 0);
+    this.inStock = total > 0;
+};
+
 
 export const Product = mongoose.model<IProduct>("Product", productSchema);
