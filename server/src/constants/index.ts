@@ -8,8 +8,6 @@ export const constants = {
         M: "M",
         L: "L", 
         XL: "XL",
-        XXL: "XXL",
-        XXXL: "XXXl"
     },
     PAYMENT_MODE: {
         COD: "COD",
