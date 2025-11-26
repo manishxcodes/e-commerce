@@ -1,6 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { constants } from "../constants/index.ts"
 import { AppError } from 'utils/AppError.ts';
+
+export interface IProductSize {
+    size: string,
+    quantity: number
+}
 export interface IProduct extends Document {
     title: string,
     description: string,
@@ -8,10 +13,7 @@ export interface IProduct extends Document {
     brand: string,
     category: mongoose.Types.ObjectId,
     imageUrl: string,
-    sizes: {
-        size: string,
-        quantity: number,
-    }[],
+    sizes: IProductSize[],
     tags?: string[],
     price: number,
     inStock: boolean,
@@ -86,7 +88,7 @@ const productSchema: Schema = new Schema<IProduct>({
 }, {timestamps: true});
 
 productSchema.methods.isSizeInStock = function(size: string, requestQuantity: number) {
-    const productSize = this.sizes.find(s => s.size === size);
+    const productSize = this.sizes.find((s: IProductSize) => s.size === size);
 
     if(!productSize) return false;
 
@@ -94,7 +96,7 @@ productSchema.methods.isSizeInStock = function(size: string, requestQuantity: nu
 }
 
 productSchema.methods.updateStockQuantity = async function(size: string, requestQuantity: number) {
-    const sizeIndex = this.sizes.findIndex(s => s.size === size);
+    const sizeIndex = this.sizes.findIndex((s: IProductSize)=> s.size === size);
 
     if(sizeIndex === -1) throw new AppError(`Size ${size} not found for this product`, 404);
 
@@ -104,14 +106,15 @@ productSchema.methods.updateStockQuantity = async function(size: string, request
 
     this.sizes[sizeIndex].quantity = newQuantity;
 
-    const hasStock = this.sizes.some(s => s.quantity > 0);
+    const hasStock = this.sizes.some((s: IProductSize) => s.quantity > 0);
     this.inStock = hasStock;
 
     return await this.save();
 }
 
 productSchema.methods.isProductInstock = function () {
-    const total = this.sizes.reduce((sum, s) => sum + s.quantity, 0);
+    const total = this.sizes.reduce((sum: number, s: IProductSize) => sum + s.quantity, 0);
+
     this.inStock = total > 0;
 };
 
