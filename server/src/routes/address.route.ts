@@ -7,12 +7,14 @@ import {
     updateAddress,
     deleteAddress
 } from "controllers/address.controller.ts";
+import { validate } from "middlewares/validate.middleware.ts";
+import { addAddressSchema, updateAddressSchema } from "schema.ts";
 
 const router = Router();
 
-router.post("/", authMiddleware, addAddress);
+router.post("/", authMiddleware, validate(addAddressSchema), addAddress);
 router.get("/", authMiddleware, getAddress);
-router.put("/:id", authMiddleware, updateAddress);
+router.put("/:id", authMiddleware, validate(updateAddressSchema), updateAddress);
 router.delete("/:id", authMiddleware, deleteAddress);
 
 export default router;
