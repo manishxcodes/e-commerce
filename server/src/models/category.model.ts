@@ -3,8 +3,8 @@ import mongoose, { Schema, Document} from 'mongoose';
 export interface ICategory extends Document {
     name: string,
     imageUrl?: string,
-    parentCategory?: mongoose.Types.ObjectId,
-    gender?: "men" | "women" | ""
+    parentCategory?: "topwear" | "bottomwear" | "footwear",
+    gender?: "men" | "women" | "unisex"
 }
 
 const categorySchema = new Schema<ICategory>({
@@ -18,12 +18,12 @@ const categorySchema = new Schema<ICategory>({
         type: String
     },
     parentCategory: {
-        type: Schema.Types.ObjectId,
-        ref: "Category"
+        type: String, 
+        enum: ["topwear", "bottomwear", "footwear"]
     },
     gender: {
         type: String, 
-        enum: ["men", "women", ""],
+        enum: ["men", "women", "unisex"],
         default: ""
     }
 }, {timestamps: true});
