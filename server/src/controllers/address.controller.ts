@@ -47,7 +47,7 @@ export const addAddress = asyncHandler(
             await session.commitTransaction();
             session.endSession();
 
-            return AppResponse.success(
+            return AppResponse.created(
                 res,
                 "Address added successfully",
                 newAddress
@@ -68,6 +68,8 @@ export const getAddress = asyncHandler(
         const user = await User.findById(userId).populate("address");
         if(!user) return next(new AppError("User not found", 404));
 
+        if(!user.address) return AppResponse.success(res, "User doesn't have any address");
+
         return AppResponse.success(res, "Address fetched successful", user.address);
     }
 );
@@ -79,7 +81,7 @@ export const updateAddress = asyncHandler(
 
         // chekc if user exists
         const user = await User.findById(userId);
-        if(!user || user.address) return next(new AppError("No address found for this user", 404));
+        if(!user || !user.address) return next(new AppError("No address found for this user", 404));
 
         // check if user can delete address
         if(String(user.address) !== id) return next(new AppError("Unauthorized to update this address", 403));
@@ -105,7 +107,7 @@ export const deleteAddress = asyncHandler(
 
         // chekc if user exists
         const user = await User.findById(userId);
-        if(!user || user.address) return next(new AppError("No address found for this user", 404));
+        if(!user || !user.address) return next(new AppError("No address found for this user", 404));
 
         // check if user can delete address
         if(String(user.address) !== id) return next(new AppError("Unauthorized to update this address", 403));
