@@ -1,4 +1,6 @@
+import mongoose from 'mongoose';
 import { z } from 'zod';
+import { constants } from 'constants/index.ts';
 
 // user schema 
 export const registerSchema = z.object({
@@ -46,6 +48,45 @@ export const updateAddressSchema = z.object({
     pincode: z.string().optional(),
     country: z.string().optional(),
 });
+
+// product schema
+export const objectId = z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+    message: "Invalid objectId"
+});
+
+const productSizeSchema = z.object({
+    size: z.enum(Object.values(constants.PRODUCT_SIZES) as [string, ...string[]]),
+    quantity: z.number().min(0, "Quantity cannot be negative")
+});
+
+export const createProductSchema = z.object({
+  title: z.string().max(80, "Title too long"),
+  description: z.string().max(1000),
+  summary: z.string().max(200),
+  brand: z.string().max(30),
+  category: objectId,
+  imageKey: z.string().optional(),
+  sizes: z.array(productSizeSchema).nonempty("At least one size is required"),
+  tags: z.array(z.string()).optional(),
+  price: z.number().min(50, "Minimum price is 50"),
+  owner: objectId,
+});
+
+export const updateProductSchema = z.object({
+  title: z.string().max(80).optional(),
+  description: z.string().max(1000).optional(),
+  summary: z.string().max(200).optional(),
+  brand: z.string().max(30).optional(),
+  category: objectId.optional(),
+  imageKey: z.string().optional(),
+  sizes: z.array(productSizeSchema).optional(),
+  tags: z.array(z.string()).optional(),
+  price: z.number().min(50).optional(),
+  owner: objectId.optional(),
+  inStock: z.boolean().optional(),
+});
+
+
 
 
 /**
