@@ -12,7 +12,8 @@ export interface IProduct extends Document {
     summary: string,
     brand: string,
     category: mongoose.Types.ObjectId,
-    imageUrl: string,
+    imageKey:String,
+    imageUrl?: string,
     sizes: IProductSize[],
     tags?: string[],
     price: number,
@@ -51,7 +52,7 @@ const productSchema: Schema = new Schema<IProduct>({
         ref: "Category",
         required: true
     },
-    imageUrl: {
+    imageKey: {
         type: String,
         required: true,
     },
@@ -86,6 +87,16 @@ const productSchema: Schema = new Schema<IProduct>({
         ref: "User"
     }
 }, {timestamps: true});
+
+productSchema.virtual('imageUrl').get(function() {
+    const bucketName = process.env.AWS_BUCKET_NAME;
+    const region = process.env.AWS_BUCKET_REGION;
+    return `https://${bucketName}.s3.${region}.amazonaws.com/${this.imageKey}`;
+});
+
+// this lines ensure virtuals are added when converting to JSON / OBJECT
+productSchema.set('toJSON', { virtuals: true});
+productSchema.set('toObject', { virtuals: true});
 
 productSchema.methods.isSizeInStock = function(size: string, requestQuantity: number) {
     const productSize = this.sizes.find((s: IProductSize) => s.size === size);
