@@ -66,9 +66,20 @@ export const createProductSchema = z.object({
   brand: z.string().max(30),
   category: objectId,
   imageKey: z.string().optional(),
-  sizes: z.array(productSizeSchema).nonempty("At least one size is required"),
-  tags: z.array(z.string()).optional(),
-  price: z.number().min(50, "Minimum price is 50"),
+
+  sizes: z.preprocess((val) => {
+    if(typeof val === "string") return JSON.parse(val);
+    return val;
+  }, z.array(productSizeSchema)),
+
+  tags: z.preprocess((val) => {
+    if(!val) return [];
+    if(typeof val === "string") return JSON.parse(val);
+    return val;
+  }, z.array(z.string()).optional()),
+
+  price: z.preprocess(val => Number(val), z.number().min(50)),
+  
   owner: objectId,
 });
 
@@ -79,12 +90,28 @@ export const updateProductSchema = z.object({
   brand: z.string().max(30).optional(),
   category: objectId.optional(),
   imageKey: z.string().optional(),
-  sizes: z.array(productSizeSchema).optional(),
-  tags: z.array(z.string()).optional(),
-  price: z.number().min(50).optional(),
+
+  sizes: z.preprocess((val) => {
+    if (!val) return undefined;
+    if (typeof val === "string") return JSON.parse(val);
+    return val;
+  }, z.array(productSizeSchema).optional()),
+
+  tags: z.preprocess((val) => {
+    if (!val) return undefined;
+    if (typeof val === "string") return JSON.parse(val);
+    return val;
+  }, z.array(z.string()).optional()),
+
+  price: z.preprocess((val) => {
+    if (val === undefined) return undefined;
+    return Number(val);
+  }, z.number().min(50).optional()),
+
   owner: objectId.optional(),
   inStock: z.boolean().optional(),
 });
+
 
 
 
