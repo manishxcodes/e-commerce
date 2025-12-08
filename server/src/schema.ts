@@ -59,7 +59,7 @@ const productSizeSchema = z.object({
     quantity: z.number().min(0, "Quantity cannot be negative")
 });
 
-export const createProductSchema = z.object({
+export const addProductSchema = z.object({
   title: z.string().max(80, "Title too long"),
   description: z.string().max(1000),
   summary: z.string().max(200),
