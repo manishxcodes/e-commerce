@@ -50,7 +50,7 @@ export const updateAddressSchema = z.object({
 });
 
 // product schema
-export const objectId = z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+export const mongooseObjectId = z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
     message: "Invalid objectId"
 });
 
@@ -64,7 +64,7 @@ export const addProductSchema = z.object({
   description: z.string().max(1000),
   summary: z.string().max(200),
   brand: z.string().max(30),
-  category: objectId,
+  category: mongooseObjectId,
   imageKey: z.string().optional(),
 
   sizes: z.preprocess((val) => {
@@ -80,7 +80,7 @@ export const addProductSchema = z.object({
 
   price: z.preprocess(val => Number(val), z.number().min(50)),
   
-  owner: objectId,
+  owner: mongooseObjectId,
 });
 
 export const updateProductSchema = z.object({
@@ -88,7 +88,7 @@ export const updateProductSchema = z.object({
   description: z.string().max(1000).optional(),
   summary: z.string().max(200).optional(),
   brand: z.string().max(30).optional(),
-  category: objectId.optional(),
+  category: mongooseObjectId.optional(),
   imageKey: z.string().optional(),
 
   sizes: z.preprocess((val) => {
@@ -108,7 +108,7 @@ export const updateProductSchema = z.object({
     return Number(val);
   }, z.number().min(50).optional()),
 
-  owner: objectId.optional(),
+  owner: mongooseObjectId.optional(),
   inStock: z.boolean().optional(),
 });
 
