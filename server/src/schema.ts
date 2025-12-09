@@ -60,7 +60,7 @@ const productSizeSchema = z.object({
 });
 
 export const addProductSchema = z.object({
-  title: z.string().max(80, "Title too long"),
+  name: z.string().max(80, "Title too long"),
   description: z.string().max(1000),
   summary: z.string().max(200),
   brand: z.string().max(30),
@@ -84,7 +84,7 @@ export const addProductSchema = z.object({
 });
 
 export const updateProductSchema = z.object({
-  title: z.string().max(80).optional(),
+  name: z.string().max(80).optional(),
   description: z.string().max(1000).optional(),
   summary: z.string().max(200).optional(),
   brand: z.string().max(30).optional(),

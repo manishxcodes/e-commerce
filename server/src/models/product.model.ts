@@ -7,7 +7,7 @@ export interface IProductSize {
     quantity: number
 }
 export interface IProduct extends Document {
-    title: string,
+    name: string,
     description: string,
     summary: string,
     brand: string,
@@ -26,7 +26,7 @@ export interface IProduct extends Document {
 }
 
 const productSchema: Schema = new Schema<IProduct>({
-    title: {
+    name: {
         type: String,
         required: true,
         maxlength: 80,
