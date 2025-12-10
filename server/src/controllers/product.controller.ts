@@ -16,8 +16,12 @@ export const addProduct = asyncHandler(
         const file = req.file;
         const ownerId = req.user?.userId
 
-        const imageKey = uploadToS3(file, 'products');
-        if(!imageKey) return next(new AppError("Failed to upload image to s3", 500));
+        let imageKey;
+        if(req.file) {
+            imageKey = uploadToS3(file, 'products');
+            if(!imageKey) return next(new AppError("Failed to upload image to s3", 500));
+        }
+        
 
         const product = await Product.create({
             name,
@@ -45,9 +49,15 @@ export const getAllProducts = asyncHandler(
     }
 );
 
-export const getProduct = asyncHandler(
+export const getProductById = asyncHandler(
     async(req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        if(!id) return next(new AppError("Product id is missing", 400));
 
+        const product = await Product.findById(id);
+        if(!product) return next(new  AppError("Product not found", 404));
+
+        return AppResponse.success(res, "Product found", product);
     }
 );
 
