@@ -8,7 +8,7 @@ const router = Router();
 
 router.use('/user', userRouter);
 router.use('/otp', otpRouter);
-router.use('/upload', productRouter);
+router.use('/product', productRouter);
 router.use('/address', addressRouter)
 
 
