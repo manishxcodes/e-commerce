@@ -39,7 +39,6 @@ export const registerUser = asyncHandler(
 export const login = asyncHandler(
     async(req: Request, res: Response, next: NextFunction) => {
         const { email, password } = req.body;
-        const jwtsecret = process.env.JWT_SECRET!;
 
         const user = await User.findOne({ email })
             .select("-__v  -createdAt -updatedAt +password");
@@ -63,9 +62,9 @@ export const login = asyncHandler(
         return res.status(200)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", refreshToken, options)
-            .json(
-                AppResponse.success(res, "Login Successfull", {token: accessToken})
-            )
+            .json({
+                 message: "Login Successfull", token: accessToken
+                })
     }
 );
 
@@ -89,9 +88,9 @@ export const logout = asyncHandler(
        return res.status(200)
             .clearCookie("accessToken",  options)
             .clearCookie("refreshToken",  options)
-            .json(
-                AppResponse.success(res, "Logged Out Successfully")
-            );
+            .json({
+                message: "Logged Out Successfully"
+            });
     }
 );
 
@@ -135,11 +134,10 @@ export const refreshAccessToken = asyncHandler(
             .status(200)
             .cookie("accessToken", newAccessToken, options)
             .cookie("refreshToken", newRefreshToken, options)
-            .json(
-                AppResponse.success(res, "Tokens refreshed successfully", {
+            .json({
+                    message: "Tokens refreshed successfully", 
                     accessToken: newAccessToken,
-                })
-            );       
+                });     
     }
 );
 
