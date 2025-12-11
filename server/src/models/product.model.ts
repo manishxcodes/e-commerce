@@ -1,6 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { constants } from "../constants/index.ts"
 import { AppError } from 'utils/AppError.ts';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { s3 } from 'config/aws.ts';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export interface IProductSize {
     size: string,
@@ -12,7 +15,7 @@ export interface IProduct extends Document {
     summary: string,
     brand: string,
     category: mongoose.Types.ObjectId,
-    imageKey:String,
+    imageKey: string,
     imageUrl?: string,
     sizes: IProductSize[],
     tags?: string[],
@@ -20,6 +23,7 @@ export interface IProduct extends Document {
     inStock: boolean,
     owner: mongoose.Types.ObjectId,
 
+    getSignedUrl(): Promise<string>
     isSizeInStock(size: string, requestQuantity: number): boolean,
     updateStockQuantity(size: string, requestQuantity: number): Promise<IProduct>,
     isProductInstock(): boolean
@@ -88,15 +92,16 @@ const productSchema: Schema = new Schema<IProduct>({
     }
 }, {timestamps: true});
 
-productSchema.virtual('imageUrl').get(function() {
+productSchema.methods.getSignedUrl = async function() {
     const bucketName = process.env.AWS_BUCKET_NAME;
-    const region = process.env.AWS_BUCKET_REGION;
-    return `https://${bucketName}.s3.${region}.amazonaws.com/${this.imageKey}`;
-});
 
-// this lines ensure virtuals are added when converting to JSON / OBJECT
-productSchema.set('toJSON', { virtuals: true});
-productSchema.set('toObject', { virtuals: true});
+    const command = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: this.imageKey
+    });
+
+    return await getSignedUrl(s3, command, { expiresIn: 86400});
+}
 
 productSchema.methods.isSizeInStock = function(size: string, requestQuantity: number) {
     const productSize = this.sizes.find((s: IProductSize) => s.size === size);
