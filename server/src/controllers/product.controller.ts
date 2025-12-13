@@ -55,7 +55,7 @@ export const getProductById = asyncHandler(
         const { id } = req.params;
         if(!id) return next(new AppError("Product id is missing", 400));
 
-        const product = await Product.findById(id);
+        const product = await Product.findById(id).select('-sizes._id');
         if(!product) return next(new  AppError("Product not found", 404));
     
         const imageUrl = await product.getSignedUrl();
@@ -135,5 +135,42 @@ export const deleteProduct = asyncHandler(
         return AppResponse.success(res, "Product deleted successfully");
     }
 );
+
+export const updateProductStock = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const { size, quantity } = req.body;
+        const { id } = req.params;
+        const userId = req.user?.userId;
+
+        if(!id) return next(new AppError("Product not found", 404));
+
+
+        // check product exist
+        const product = await Product.findById(id);
+        if(!product) return next(new AppError("Product not found", 404));
+
+        // check if the current admin is authorize to update this
+        if(product.owner.toString() !== userId) {
+            return next(new AppError("You are not allowed to update product", 403));
+        }        
+
+        const updatedProduct = await Product.findOneAndUpdate(
+            { 
+                _id: id,
+                "sizes.size": size
+            },
+            {
+                $set: { "sizes.$.quantity": quantity }
+            }, 
+            {
+                new: true
+            }
+        )
+
+        if(!updatedProduct) return next(new AppError("Product of this size is not found", 404));
+
+        return AppResponse.success(res, `Update stock of size: ${size} to ${quantity}`, {data: updatedProduct})
+    }
+)
 
 
