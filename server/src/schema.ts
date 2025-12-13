@@ -80,7 +80,7 @@ export const addProductSchema = z.object({
 
   price: z.preprocess(val => Number(val), z.number().min(50)),
   
-  owner: mongooseObjectId,
+  owner: mongooseObjectId.optional(),
 });
 
 export const updateProductSchema = z.object({
@@ -95,7 +95,7 @@ export const updateProductSchema = z.object({
     if (!val) return undefined;
     if (typeof val === "string") return JSON.parse(val);
     return val;
-  }, z.array(productSizeSchema).optional()),
+  }, z.array(productSizeSchema)).optional(),
 
   tags: z.preprocess((val) => {
     if (!val) return undefined;
@@ -106,13 +106,16 @@ export const updateProductSchema = z.object({
   price: z.preprocess((val) => {
     if (val === undefined) return undefined;
     return Number(val);
-  }, z.number().min(50).optional()),
+  }, z.number().min(50)).optional(),
 
   owner: mongooseObjectId.optional(),
   inStock: z.boolean().optional(),
 });
 
-
+export const updateProductStockSchema = z.object({
+  size: z.enum(["S", "M", "L", "XL"]),
+  quantity: z.number().min(1, "Quantity cannot be less than 1")
+})
 
 
 
