@@ -92,6 +92,11 @@ const productSchema: Schema = new Schema<IProduct>({
     }
 }, {timestamps: true});
 
+productSchema.index({ category: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ tags: 1 });
+productSchema.index({ createdAt: 1 });
+
 productSchema.methods.getSignedUrl = async function() {
     const bucketName = process.env.AWS_BUCKET_NAME;
 
