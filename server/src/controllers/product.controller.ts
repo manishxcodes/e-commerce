@@ -1,9 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "middlewares/async-handler.ts";
-import { Product } from "models/product.model.ts";
+import { Product, type IProduct } from "models/product.model.ts";
 import { AppError } from "utils/AppError.ts";
 import { AppResponse } from "utils/AppResponse.ts";
 import { deleteFromS3, uploadToS3 } from "utils/s3.ts";
+import { Category } from "models/category.model.ts";
+import type { FilterQuery } from "mongoose";
 
 export const addProduct = asyncHandler(
     async(req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +16,7 @@ export const addProduct = asyncHandler(
         // get file and product data
         const { name, description, summary, brand, category, sizes, price, tags, owner } = req.body;
         const file = req.file;
-        const ownerId = req.user?.userId
+        const ownerId = req.user?.userId || owner
 
         // upllaod to s3
         let imageKey;
@@ -46,7 +48,51 @@ export const addProduct = asyncHandler(
 
 export const getAllProducts = asyncHandler(
     async(req: Request, res: Response, next: NextFunction) => {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
+        const { category, minPrice, maxPrice } = req.query;
+
+        const filter:FilterQuery<IProduct> = {};
+
+        // category filter
+        if(category) filter.category = category;
+        
+        // price filter 
+        if(minPrice || maxPrice) {
+            filter.price = {};
+            if(minPrice) filter.price.$gte = Number(minPrice);
+            if(maxPrice) filter.price.$lte = Number(maxPrice);
+        }
+
+        const product = await Product.find(filter)
+            .populate('category', 'name parentCategory gender')
+            .sort( {createdAt: -1} )
+            .skip(skip)
+            .limit(limit);
+
+        const productWithImages = await Promise.all(
+            product.map(async (product) => {
+                const imageUrl = await product.getSignedUrl();
+                return {
+                    ...product.toObject(),
+                    imageUrl
+                };
+            })
+        );
+
+        const totalProducts = await Product.countDocuments(filter);
+
+        return AppResponse.success(res, "Product fetched successfully", {
+            data: productWithImages,
+            pagination: {
+                total: totalProducts,
+                page,
+                limit,
+                totalPages: Math.ceil(totalProducts/limit)
+            }
+        })
     }
 );
 
@@ -75,7 +121,7 @@ export const updateProduct = asyncHandler(
         if(!id) return next(new AppError("Product id is missing", 404));
         
         // check product exist
-        const product = await Product.findById(id);
+        const product = await Product.findById(id).select('-sizes._id');;
         if(!product) return next(new AppError("Product not found", 404));
 
         // check if the current admin is authorize to update this
