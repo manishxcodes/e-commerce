@@ -31,7 +31,7 @@ export const authMiddleware = asyncHandler(
         const jwtsecret = process.env.ACCESS_TOKEN_SECRET;
         if(!jwtsecret) return next(new AppError("Something went wrong", 500));
 
-        const token = authToken.split(" ")[1];
+        const token = authToken.split(" ")[1] || req.cookies.accessToken;
         if(!token) return next(new AppError("Invalid token", 401));
 
         const payload = jwt.verify(token, jwtsecret) as IPayload;
