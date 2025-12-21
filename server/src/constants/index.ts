@@ -19,6 +19,15 @@ export const constants = {
         SHIPPED: "Shipped",
         PROCESSING: "Processing",
         RECIEVED: "Received",
+    },
+    IMAGE_DELETION_REASON: {
+        PRODUCT_DELETE: "PRODUCT_DELETE",
+        PRODUCT_UPDATE: "PRODUCT_UPDATE"
+    },
+    IMAGE_DELETION_STATUS: {
+        PENDING: "PENDING",
+        DELETED: "DELETED",
+        FAILED: "FAILED"
     }
 }
 
