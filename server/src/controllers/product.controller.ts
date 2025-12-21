@@ -6,6 +6,8 @@ import { AppResponse } from "utils/AppResponse.ts";
 import { deleteFromS3, uploadToS3 } from "utils/s3.ts";
 import { Category } from "models/category.model.ts";
 import type { FilterQuery } from "mongoose";
+import { ImageDeletion } from "models/imageToBeDeleted.model.ts";
+import { constants } from '../constants/index.ts';
 
 export const addProduct = asyncHandler(
     async(req: Request, res: Response, next: NextFunction) => {
@@ -130,23 +132,21 @@ export const updateProduct = asyncHandler(
         }
 
         // get old imageKey and replace with new one
-        let imageKey = product.imageKey;
+        let newImageKey = product.imageKey;
         if(req.file) {
-            const newImageKey = await uploadToS3(req.file, "products");
+            newImageKey = await uploadToS3(req.file, "products");
             if(!newImageKey) return next(new AppError("Failed to update image. Try again", 500));
 
             // if we get new image delete previous image from s2
-            if(imageKey) {
-                try {
-                    await deleteFromS3(imageKey);
-                } catch(err) {
-                    console.log("failed to delete old image: ", err);
-                }
+            if(product.imageKey) {
+                await ImageDeletion.create({
+                    imageKey: product.imageKey,
+                    reason: constants.IMAGE_DELETION_REASON.PRODUCT_UPDATE
+                })
             }
-            imageKey = newImageKey;
         }
 
-        const updatedBody = { ...req.body, imageKey };
+        const updatedBody = { ...req.body, imageKey: newImageKey };
         // if new imageKey update the proudct or else thorw error
         const updatedProduct = await Product.findByIdAndUpdate(
             id, 
