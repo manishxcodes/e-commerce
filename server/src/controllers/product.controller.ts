@@ -173,10 +173,11 @@ export const deleteProduct = asyncHandler(
             return next(next(new AppError("You are not allowed to delete product")));
         }
 
-        // delete from db and s3
+        await ImageDeletion.create({
+            imageKey: product.imageKey,
+            reason: constants.IMAGE_DELETION_REASON.PRODUCT_DELETE
+        });
         await Product.findByIdAndDelete(id);
-
-        await deleteFromS3(product.imageKey);
 
         return AppResponse.success(res, "Product deleted successfully");
     }
