@@ -3,31 +3,43 @@ export const constants = {
         ADMIN: 1,
         USER: 0
     },
+
     PRODUCT_SIZES: {
-        S: "S",
-        M: "M",
-        L: "L", 
-        XL: "XL",
+        S: "s",
+        M: "m",
+        L: "l",
+        XL: "xl",
     },
+
     PAYMENT_MODE: {
-        COD: "COD",
-        ONLINE: "ONLINE"
+        COD: "cod",
+        ONLINE: "online"
     },
+
     ORDER_STATUS: {
-        CANCELLED: "Cancelled",
-        DELIVERED: "Delivered",
-        SHIPPED: "Shipped",
-        PROCESSING: "Processing",
-        RECIEVED: "Received",
+        PENDING: "pending",
+        PROCESSING: "processing",
+        SHIPPED: "shipped",
+        DELIVERED: "delivered",
+        RECEIVED: "received",
+        CANCELLED: "cancelled"
     },
+
     IMAGE_DELETION_REASON: {
-        PRODUCT_DELETE: "PRODUCT_DELETE",
-        PRODUCT_UPDATE: "PRODUCT_UPDATE"
+        PRODUCT_DELETE: "product_delete",
+        PRODUCT_UPDATE: "product_update"
     },
+
     IMAGE_DELETION_STATUS: {
-        PENDING: "PENDING",
-        DELETED: "DELETED",
-        FAILED: "FAILED"
+        PENDING: "pending",
+        DELETED: "deleted",
+        FAILED: "failed"
+    },
+
+    PAYMENT_STATUS: {
+        PENDING: "pending",
+        COMPLETED: "completed",
+        FAILED: "failed",
+        REFUNDED: "refunded"
     }
 }
-
