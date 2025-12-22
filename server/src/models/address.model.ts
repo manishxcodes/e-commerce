@@ -4,8 +4,9 @@ import mongoose, { Document, Schema } from "mongoose";
 //It extends Mongoose’s Document so we get MongoDB-specific features like _id.
 
 export interface IAddress extends Document {
-    houseNumber: string,
-    lane: string,
+    addressLine1?: string,
+    addressLine2?: string,
+    houseNumber?: string,
     city: string,
     district: string,
     state: string,
@@ -14,13 +15,14 @@ export interface IAddress extends Document {
 }
 
 const addressSchema: Schema = new Schema<IAddress>({
+    addressLine1: {
+        type: String,
+    },
+    addressLine2: {
+        type: String,
+    },
     houseNumber: {
         type: String,
-        required: true
-    },
-    lane: {
-        type: String,
-        required: true
     },
     city: {
         type: String,
