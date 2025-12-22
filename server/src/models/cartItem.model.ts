@@ -4,14 +4,11 @@ import type { IUser } from "./user.model.ts";
 import { constants } from "../constants/index.ts";
 
 export interface ICartItem extends Document {
-    product: IProduct,
-    quantity: Number,
-    amount: string
-    user: IUser,
+    product: mongoose.Types.ObjectId,
+    quantity: number,
     size: string,
-    summary: string, 
-    title: string,
-    image: string,
+    user: mongoose.Types.ObjectId,
+    price: number
 }
 
 const cartItemSchema: Schema = new mongoose.Schema<ICartItem>({
@@ -23,9 +20,11 @@ const cartItemSchema: Schema = new mongoose.Schema<ICartItem>({
     quantity: {
         type: Number,
         required: true,
+        min: 1, 
+        max: 10
     },
-    amount: {
-        type: String,
+    price: {
+        type: Number,
         required: true,
     }, 
     user: {
@@ -36,19 +35,8 @@ const cartItemSchema: Schema = new mongoose.Schema<ICartItem>({
     }, 
     size: {
         type: String,
-        enum: Object.values(constants.PRODUCT_SIZES)
-    },
-    summary: {
-        type: String,
-        required: true,
-    },
-    title: {
-        type: String,
-        required: true,
-    },
-    image: {
-        type: String,
-        required: true,
+        enum: Object.values(constants.PRODUCT_SIZES),
+        required: true
     },  
 }, {timestamps: true});
 
