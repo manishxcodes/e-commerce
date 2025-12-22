@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { z } from 'zod';
+import { minLength, z } from 'zod';
 import { constants } from 'constants/index.ts';
 
 // user schema 
@@ -117,14 +117,8 @@ export const updateProductStockSchema = z.object({
   quantity: z.number().min(1, "Quantity cannot be less than 1")
 })
 
-
-
-/**
- * make cart item / orderitem ' use claude for reference
- * // make user controller
- *                  // product , cartItem need some change in mode 
- *                  // mainly in interface replace IUser with mongoose.type.objectId. do same for other
- * // product controller
- * // cart/orderItem controller then order controller
- * // vendor controller
- */
+export const addToCartSchema = z.object({
+  productId: mongooseObjectId,
+  size: z.string(), 
+  quantity: z.number().min(1, "Quantity cannot be less than 1").max(10, "Quantity cannot be greater than 10").optional()
+})
