@@ -1,8 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-//Address interface: Defines the TypeScript type for a Address document.
-//It extends Mongoose’s Document so we get MongoDB-specific features like _id.
-
 export interface IAddress extends Document {
     addressLine1?: string,
     addressLine2?: string,
