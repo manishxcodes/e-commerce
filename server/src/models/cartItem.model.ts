@@ -1,6 +1,4 @@
 import mongoose, { Document, Schema } from "mongoose";
-import type { IProduct } from "./product.model.ts";
-import type { IUser } from "./user.model.ts";
 import { constants } from "../constants/index.ts";
 
 export interface ICartItem extends Document {
@@ -8,7 +6,10 @@ export interface ICartItem extends Document {
     quantity: number,
     size: string,
     user: mongoose.Types.ObjectId,
-    price: number
+    priceAtAddTime: number,
+
+    createdAt: Date,
+    updatedAt: Date
 }
 
 const cartItemSchema: Schema = new mongoose.Schema<ICartItem>({
@@ -23,7 +24,7 @@ const cartItemSchema: Schema = new mongoose.Schema<ICartItem>({
         min: 1, 
         max: 10
     },
-    price: {
+    priceAtAddTime: {
         type: Number,
         required: true,
     }, 
